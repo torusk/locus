@@ -1,9 +1,10 @@
 import { ConnectButton, useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
-import { useState } from 'react';
-import { MapPin, Send, Loader2, CheckCircle2, Wallet } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { MapPin, Send, Loader2, CheckCircle2, Wallet, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
+import { getGoogleOAuthUrl, parseJwtFromUrl, getSuiAddressFromJwt } from './utils/zkLogin';
 
 // Configuration
 const PACKAGE_ID = '0x7fe284ce69c9bd0cbd43637b3a5bb961b71df27eb66ac40efe90b179bfa6df6c';
@@ -17,17 +18,41 @@ function App() {
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [zkLoginAddress, setZkLoginAddress] = useState<string | null>(null);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.includes('id_token')) {
+      const idToken = parseJwtFromUrl(hash);
+      if (idToken) {
+        try {
+          const address = getSuiAddressFromJwt(idToken);
+          setZkLoginAddress(address);
+          window.history.replaceState(null, '', window.location.pathname);
+          setStatus({ type: 'success', message: 'Googleログインに成功しました！' });
+        } catch (e) {
+          console.error('Error deriving address:', e);
+          setStatus({ type: 'error', message: 'ログインに失敗しました。' });
+        }
+      }
+    }
+  }, []);
 
   const handleCheckIn = () => {
-    if (!account) return;
+    if (!account && !zkLoginAddress) return;
     setIsCheckingIn(true);
     setStatus(null);
 
+    if (zkLoginAddress) {
+      // Simulated Check In for zkLogin
+      setTimeout(() => {
+        setStatus({ type: 'success', message: '東京でのチェックインに成功しました！ (zkLogin Simulation)' });
+        setIsCheckingIn(false);
+      }, 1000);
+      return;
+    }
+
     const tx = new Transaction();
-    // check_in(location: String, clock: &Clock)
-    // String in Move is often passed as a pure string or vector<u8> depending on the wrapper.
-    // The user request said: Arguments: `vector<u8>` (string "Tokyo"), and `0x6` (Sui Clock Object).
-    // In TS SDK, we can pass string for vector<u8> if using Pure, but let's be explicit.
     tx.moveCall({
       target: `${PACKAGE_ID}::${MODULE_NAME}::check_in`,
       arguments: [
@@ -55,12 +80,21 @@ function App() {
 
   const handleSubmitProposal = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!account || !proposalText.trim()) return;
+    if ((!account && !zkLoginAddress) || !proposalText.trim()) return;
     setIsSubmitting(true);
     setStatus(null);
 
+    if (zkLoginAddress) {
+      // Simulated Proposal for zkLogin
+      setTimeout(() => {
+        setStatus({ type: 'success', message: '提案が正常に送信されました！ (zkLogin Simulation)' });
+        setProposalText('');
+        setIsSubmitting(false);
+      }, 1000);
+      return;
+    }
+
     const tx = new Transaction();
-    // create_proposal(description: String, ...) - assuming signature based on request
     tx.moveCall({
       target: `${PACKAGE_ID}::${MODULE_NAME}::create_proposal`,
       arguments: [
@@ -102,11 +136,47 @@ function App() {
         </div>
 
         {/* Wallet Connection */}
-        <div className="flex justify-center">
-          <ConnectButton className="!bg-slate-900 !text-white !rounded-lg !font-medium !px-6 !py-3 hover:!bg-slate-800 transition-all shadow-lg" />
+        <div className="flex flex-col items-center gap-4">
+          {!zkLoginAddress && (
+            <ConnectButton className="!bg-slate-900 !text-white !rounded-lg !font-medium !px-6 !py-3 hover:!bg-slate-800 transition-all shadow-lg" />
+          )}
+
+          {!account && !zkLoginAddress && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">または</span>
+            </div>
+          )}
+
+          {!account && !zkLoginAddress && (
+            <a
+              href={getGoogleOAuthUrl()}
+              className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-lg font-medium text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
+            >
+              <LogIn className="w-5 h-5" />
+              Login with Google
+            </a>
+          )}
+
+          {zkLoginAddress && (
+            <div className="flex flex-col items-center gap-2 p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-slate-200">
+              <div className="flex items-center gap-2 text-sm font-medium text-slate-900">
+                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" />
+                zkLogin Connected
+              </div>
+              <div className="text-xs text-muted-foreground font-mono break-all text-center">
+                {zkLoginAddress}
+              </div>
+              <button
+                onClick={() => setZkLoginAddress(null)}
+                className="text-xs text-red-500 hover:underline mt-1"
+              >
+                ログアウト
+              </button>
+            </div>
+          )}
         </div>
 
-        {!account ? (
+        {!account && !zkLoginAddress ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
