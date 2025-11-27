@@ -1,34 +1,34 @@
-# Locus - Decentralized Location Proofs
+# Locus - 分散型位置証明
 
-Locus is a decentralized application (dApp) built on the Sui Network that allows users to verify their presence at specific locations and submit proposals.
+LocusはSuiネットワーク上に構築された分散型アプリケーション（dApp）で、ユーザーが特定の場所での存在を証明し、提案を送信できるようにします。
 
-## Project Structure
+## プロジェクト構成
 
-- **`sources/`**: Contains the Move smart contracts.
-  - `locus.move`: The main module for location check-ins and proposals.
-- **`frontend/`**: A React application for interacting with the smart contract.
-  - Built with Vite, React, TypeScript, Tailwind CSS, and `@mysten/dapp-kit`.
+- **`sources/`**: Moveスマートコントラクトが含まれています。
+  - `locus.move`: 位置チェックインと提案のためのメインモジュール。
+- **`frontend/`**: スマートコントラクトと対話するためのReactアプリケーション。
+  - Vite、React、TypeScript、Tailwind CSS、`@mysten/dapp-kit`で構築されています。
 
-## Features
+## 機能
 
-- **Check In**: Verify your location on-chain (currently hardcoded to "Tokyo" for demo purposes).
-- **Submit Proposal**: Submit text-based proposals to the blockchain.
-- **Testnet Support**: Configured to work with the Sui Testnet.
+- **チェックイン**: オンチェーンで位置を証明します（現在はデモ用に「東京」に固定されています）。
+- **提案の送信**: テキストベースの提案をブロックチェーンに送信します。
+- **テストネットサポート**: Sui Testnetで動作するように構成されています。
 
-## Getting Started
+## 始め方
 
-### Smart Contract
+### スマートコントラクト
 
-1. Install Sui CLI.
-2. Switch to Testnet: `sui client switch --env testnet`
-3. Build and publish: `sui client publish --gas-budget 100000000`
+1. Sui CLIをインストールします。
+2. テストネットに切り替え: `sui client switch --env testnet`
+3. ビルドと公開: `sui client publish --gas-budget 100000000`
 
-### Frontend
+### フロントエンド
 
-1. Navigate to the frontend directory: `cd frontend`
-2. Install dependencies: `npm install`
-3. Start the development server: `npm run dev`
+1. フロントエンドディレクトリに移動: `cd frontend`
+2. 依存関係をインストール: `npm install`
+3. 開発サーバーを起動: `npm run dev`
 
-## License
+## ライセンス
 
 MIT

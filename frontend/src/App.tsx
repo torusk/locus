@@ -41,12 +41,12 @@ function App() {
       {
         onSuccess: (result) => {
           console.log('Check-in success:', result);
-          setStatus({ type: 'success', message: 'Checked in successfully at Tokyo!' });
+          setStatus({ type: 'success', message: '東京でのチェックインに成功しました！' });
           setIsCheckingIn(false);
         },
         onError: (error) => {
           console.error('Check-in failed:', error);
-          setStatus({ type: 'error', message: `Check-in failed: ${error.message}` });
+          setStatus({ type: 'error', message: `チェックインに失敗しました: ${error.message}` });
           setIsCheckingIn(false);
         },
       },
@@ -73,13 +73,13 @@ function App() {
       {
         onSuccess: (result) => {
           console.log('Proposal created:', result);
-          setStatus({ type: 'success', message: 'Proposal submitted successfully!' });
+          setStatus({ type: 'success', message: '提案が正常に送信されました！' });
           setProposalText('');
           setIsSubmitting(false);
         },
         onError: (error) => {
           console.error('Proposal failed:', error);
-          setStatus({ type: 'error', message: `Submission failed: ${error.message}` });
+          setStatus({ type: 'error', message: `送信に失敗しました: ${error.message}` });
           setIsSubmitting(false);
         },
       },
@@ -95,15 +95,15 @@ function App() {
       <main className="w-full max-w-md z-10 space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
+          <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">
             Locus
           </h1>
-          <p className="text-muted-foreground">Decentralized Location Proofs</p>
+          <p className="text-muted-foreground">分散型位置証明</p>
         </div>
 
         {/* Wallet Connection */}
         <div className="flex justify-center">
-          <ConnectButton className="!bg-secondary !text-white !rounded-lg !font-medium !px-6 !py-3 hover:!bg-secondary/80 transition-all" />
+          <ConnectButton className="!bg-slate-900 !text-white !rounded-lg !font-medium !px-6 !py-3 hover:!bg-slate-800 transition-all shadow-lg" />
         </div>
 
         {!account ? (
@@ -113,7 +113,7 @@ function App() {
             className="glass-card text-center py-12"
           >
             <Wallet className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-lg font-medium">Connect your wallet to continue</p>
+            <p className="text-lg font-medium">ウォレットを接続して続行</p>
           </motion.div>
         ) : (
           <div className="space-y-6">
@@ -126,7 +126,7 @@ function App() {
                   exit={{ opacity: 0, height: 0 }}
                   className={clsx(
                     "p-4 rounded-lg flex items-center gap-3 text-sm font-medium",
-                    status.type === 'success' ? "bg-green-500/10 text-green-400 border border-green-500/20" : "bg-red-500/10 text-red-400 border border-red-500/20"
+                    status.type === 'success' ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"
                   )}
                 >
                   <CheckCircle2 className="w-5 h-5" />
@@ -143,20 +143,20 @@ function App() {
               className="glass-card space-y-4"
             >
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-primary/20 rounded-lg text-primary">
+                <div className="p-2 bg-primary/10 rounded-lg text-primary">
                   <MapPin className="w-5 h-5" />
                 </div>
-                <h2 className="text-lg font-semibold">Current Location</h2>
+                <h2 className="text-lg font-semibold">現在地</h2>
               </div>
               <p className="text-sm text-muted-foreground">
-                Verify your presence at <span className="text-white font-medium">Tokyo</span> on-chain.
+                <span className="text-slate-900 font-medium">東京</span> での存在をオンチェーンで証明します。
               </p>
               <button
                 onClick={handleCheckIn}
                 disabled={isCheckingIn}
                 className="btn-primary w-full flex items-center justify-center gap-2"
               >
-                {isCheckingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Check In Now'}
+                {isCheckingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : 'チェックイン'}
               </button>
             </motion.div>
 
@@ -168,25 +168,25 @@ function App() {
               className="glass-card space-y-4"
             >
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
+                <div className="p-2 bg-blue-500/10 rounded-lg text-blue-600">
                   <Send className="w-5 h-5" />
                 </div>
-                <h2 className="text-lg font-semibold">New Proposal</h2>
+                <h2 className="text-lg font-semibold">新規提案</h2>
               </div>
               <form onSubmit={handleSubmitProposal} className="space-y-4">
                 <input
                   type="text"
                   value={proposalText}
                   onChange={(e) => setProposalText(e.target.value)}
-                  placeholder="Describe your proposal..."
+                  placeholder="提案内容を入力..."
                   className="input-field"
                 />
                 <button
                   type="submit"
                   disabled={isSubmitting || !proposalText.trim()}
-                  className="btn-primary w-full flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/80 shadow-none"
+                  className="btn-primary w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 shadow-none text-white"
                 >
-                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Submit Proposal'}
+                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : '提案を送信'}
                 </button>
               </form>
             </motion.div>
