@@ -1,4 +1,4 @@
-import { ConnectButton, useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
+import { ConnectButton, useCurrentAccount, useSignAndExecuteTransaction, useDisconnectWallet } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
 import { useState, useEffect } from 'react';
 import { MapPin, Send, Loader2, CheckCircle2, Wallet } from 'lucide-react';
@@ -13,6 +13,7 @@ const CLOCK_OBJECT_ID = '0x6';
 
 function App() {
   const account = useCurrentAccount();
+  const { mutate: disconnect } = useDisconnectWallet();
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const [proposalText, setProposalText] = useState('');
   const [isCheckingIn, setIsCheckingIn] = useState(false);
@@ -168,6 +169,24 @@ function App() {
                 <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 opacity-80 group-hover:opacity-100 transition-opacity" />
                 Login with Google
               </a>
+            </div>
+          )}
+
+          {account && !zkLoginAddress && (
+            <div className="flex flex-col items-center gap-2 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200 shadow-sm w-full">
+              <div className="flex items-center gap-2 text-sm font-medium text-slate-900">
+                <Wallet className="w-4 h-4 text-slate-700" />
+                Wallet Connected
+              </div>
+              <div className="text-xs text-muted-foreground font-mono break-all text-center px-2">
+                {account.address}
+              </div>
+              <button
+                onClick={() => disconnect()}
+                className="text-xs text-red-500 hover:text-red-600 hover:underline mt-2 font-medium"
+              >
+                ログアウト
+              </button>
             </div>
           )}
 
