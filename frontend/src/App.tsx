@@ -1,7 +1,7 @@
 import { ConnectButton, useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
 import { useState, useEffect } from 'react';
-import { MapPin, Send, Loader2, CheckCircle2, Wallet, LogIn } from 'lucide-react';
+import { MapPin, Send, Loader2, CheckCircle2, Wallet } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { getGoogleOAuthUrl, parseJwtFromUrl, getSuiAddressFromJwt } from './utils/zkLogin';
@@ -20,18 +20,30 @@ function App() {
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [zkLoginAddress, setZkLoginAddress] = useState<string | null>(null);
 
+  const userAddress = account?.address || zkLoginAddress;
+
   useEffect(() => {
     const hash = window.location.hash;
+
     if (hash && hash.includes('id_token')) {
       const idToken = parseJwtFromUrl(hash);
+
       if (idToken) {
         try {
           const address = getSuiAddressFromJwt(idToken);
           setZkLoginAddress(address);
+
+          // Clear the hash to clean up the URL
           window.history.replaceState(null, '', window.location.pathname);
+
           setStatus({ type: 'success', message: 'Googleログインに成功しました！' });
         } catch (e) {
           console.error('Error deriving address:', e);
+
+          // Fallback for MVP/Testing if real JWT fails (optional, based on user request "or a mock address for MVP")
+          // For now, we'll stick to the error, but if the user wants a forced login for demo:
+          // setZkLoginAddress('0xMockAddressForDemo...'); 
+
           setStatus({ type: 'error', message: 'ログインに失敗しました。' });
         }
       }
@@ -39,7 +51,7 @@ function App() {
   }, []);
 
   const handleCheckIn = () => {
-    if (!account && !zkLoginAddress) return;
+    if (!userAddress) return;
     setIsCheckingIn(true);
     setStatus(null);
 
@@ -80,7 +92,7 @@ function App() {
 
   const handleSubmitProposal = (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!account && !zkLoginAddress) || !proposalText.trim()) return;
+    if (!userAddress || !proposalText.trim()) return;
     setIsSubmitting(true);
     setStatus(null);
 
@@ -121,15 +133,15 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-slate-50">
       {/* Background Elements */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
 
       <main className="w-full max-w-md z-10 space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">
+          <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700">
             Locus
           </h1>
           <p className="text-muted-foreground">分散型位置証明</p>
@@ -137,38 +149,40 @@ function App() {
 
         {/* Wallet Connection */}
         <div className="flex flex-col items-center gap-4">
-          {!zkLoginAddress && (
-            <ConnectButton className="!bg-slate-900 !text-white !rounded-lg !font-medium !px-6 !py-3 hover:!bg-slate-800 transition-all shadow-lg" />
-          )}
+          {!userAddress && (
+            <div className="w-full space-y-3">
+              <div className="w-full [&>button]:!w-full [&>button]:!justify-center [&>button]:!bg-slate-900 [&>button]:!text-white [&>button]:!rounded-xl [&>button]:!font-medium [&>button]:!px-6 [&>button]:!py-4 [&>button]:hover:!bg-slate-800 [&>button]:!transition-all [&>button]:!shadow-lg [&>button]:!h-auto">
+                <ConnectButton />
+              </div>
 
-          {!account && !zkLoginAddress && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">または</span>
+              <div className="relative flex items-center py-2">
+                <div className="flex-grow border-t border-slate-200"></div>
+                <span className="flex-shrink-0 mx-4 text-xs text-slate-400 font-medium">または</span>
+                <div className="flex-grow border-t border-slate-200"></div>
+              </div>
+
+              <a
+                href={getGoogleOAuthUrl()}
+                className="flex items-center justify-center gap-3 w-full px-6 py-4 bg-white border border-slate-200 rounded-xl font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group"
+              >
+                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 opacity-80 group-hover:opacity-100 transition-opacity" />
+                Login with Google
+              </a>
             </div>
           )}
 
-          {!account && !zkLoginAddress && (
-            <a
-              href={getGoogleOAuthUrl()}
-              className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-lg font-medium text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
-            >
-              <LogIn className="w-5 h-5" />
-              Login with Google
-            </a>
-          )}
-
           {zkLoginAddress && (
-            <div className="flex flex-col items-center gap-2 p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-slate-200">
+            <div className="flex flex-col items-center gap-2 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-slate-200 shadow-sm w-full">
               <div className="flex items-center gap-2 text-sm font-medium text-slate-900">
                 <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" />
                 zkLogin Connected
               </div>
-              <div className="text-xs text-muted-foreground font-mono break-all text-center">
+              <div className="text-xs text-muted-foreground font-mono break-all text-center px-2">
                 {zkLoginAddress}
               </div>
               <button
                 onClick={() => setZkLoginAddress(null)}
-                className="text-xs text-red-500 hover:underline mt-1"
+                className="text-xs text-red-500 hover:text-red-600 hover:underline mt-2 font-medium"
               >
                 ログアウト
               </button>
@@ -176,14 +190,15 @@ function App() {
           )}
         </div>
 
-        {!account && !zkLoginAddress ? (
+        {!userAddress ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-card text-center py-12"
+            className="glass-card text-center py-12 border-dashed border-2 border-slate-200 bg-white/50"
           >
-            <Wallet className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-lg font-medium">ウォレットを接続して続行</p>
+            <Wallet className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+            <p className="text-lg font-medium text-slate-600">ウォレットを接続して続行</p>
+            <p className="text-sm text-muted-foreground mt-1">Sui Wallet または Google アカウント</p>
           </motion.div>
         ) : (
           <div className="space-y-6">

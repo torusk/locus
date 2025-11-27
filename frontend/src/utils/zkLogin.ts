@@ -1,4 +1,5 @@
 import { jwtToAddress } from '@mysten/zklogin';
+import { sha256 } from 'js-sha256';
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const SALT = import.meta.env.VITE_ZKLOGIN_SALT;
@@ -27,5 +28,9 @@ export const parseJwtFromUrl = (hash: string) => {
 };
 
 export const getSuiAddressFromJwt = (jwt: string) => {
-    return jwtToAddress(jwt, SALT);
+    // Hash the salt string to a hex string, then convert to BigInt
+    // This ensures we have a valid numeric salt for zkLogin
+    const saltHex = sha256(SALT);
+    const saltBigInt = BigInt(`0x${saltHex}`);
+    return jwtToAddress(jwt, saltBigInt);
 };
