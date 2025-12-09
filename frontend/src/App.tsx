@@ -145,7 +145,8 @@ function App() {
           <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 pb-1">
             Login Demo
           </h1>
-          <p className="text-muted-foreground">分散型位置証明</p>
+          {/* 暫定措置: 「分散型位置証明」の表示を隠しています。必要に応じて以下のコメントアウトを解除してください。 */}
+          {/* <p className="text-muted-foreground">分散型位置証明</p> */}
         </div>
 
         {/* Wallet Connection */}
