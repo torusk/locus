@@ -143,7 +143,7 @@ function App() {
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700">
-            Locus
+            Login Demo
           </h1>
           <p className="text-muted-foreground">分散型位置証明</p>
         </div>
