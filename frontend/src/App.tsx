@@ -1,7 +1,7 @@
 import { ConnectButton, useCurrentAccount, useSignAndExecuteTransaction, useDisconnectWallet } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
 import { useState, useEffect } from 'react';
-import { MapPin, Send, Loader2, CheckCircle2, Wallet } from 'lucide-react';
+import { MapPin, Send, Loader2, CheckCircle2, Wallet, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { getGoogleOAuthUrl, parseJwtFromUrl, getSuiAddressFromJwt } from './utils/zkLogin';
@@ -141,8 +141,8 @@ function App() {
 
       <main className="w-full max-w-md z-10 space-y-8">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700">
+        <div className="text-center space-y-4 py-2">
+          <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 pb-1">
             Login Demo
           </h1>
           <p className="text-muted-foreground">分散型位置証明</p>
@@ -213,11 +213,27 @@ function App() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-card text-center py-12 border-dashed border-2 border-slate-200 bg-white/50"
+            className="glass-card text-center py-8 px-6 border-2 border-blue-100 bg-white/90 shadow-xl relative overflow-hidden"
           >
-            <Wallet className="w-12 h-12 mx-auto text-slate-300 mb-4" />
-            <p className="text-lg font-medium text-slate-600">ウォレットを接続して続行</p>
-            <p className="text-sm text-muted-foreground mt-1">Sui Wallet または Google アカウント</p>
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500" />
+
+            <div className="relative z-10">
+              <div className="w-16 h-16 mx-auto bg-blue-50 rounded-2xl flex items-center justify-center mb-4 ring-4 ring-white shadow-sm">
+                <ShieldCheck className="w-8 h-8 text-blue-600" />
+              </div>
+
+              <h3 className="text-lg font-bold text-slate-900 mb-3">
+                完全なプライバシー保護
+              </h3>
+
+              <p className="text-sm text-slate-600 leading-7 font-medium">
+                <span className="text-blue-700 font-bold">Sui</span>の<span className="text-blue-700 font-bold">ZKP（ゼロ知識証明）</span>と<span className="text-blue-700 font-bold">Salt技術</span>により、
+                <br />
+                Googleや外部に個人情報や利用履歴が
+                <br />
+                <span className="text-slate-900 font-bold border-b-2 border-blue-200">渡ることは一切ありません</span>
+              </p>
+            </div>
           </motion.div>
         ) : (
           <div className="space-y-6">
